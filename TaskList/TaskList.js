@@ -1,46 +1,55 @@
-//Task List UI Variables
-const form = document.querySelector('#task-form');
-const taskList = document.querySelector('.collection');
-const clearBtn = document.querySelector('.clear-tasks');
-const filter = document.querySelector('#filter');
-const taskInput = document.querySelector('#task');
-const closeIcon = '<i class="fa fa-remove"></i>';
-const closeItem = '.delete-item secondary-content';
-
-function loadEventListeners() {
-    return form.addEventListener('submit', addTask);
+//Task List 
+//Task List UI Elements
+const elements = {
+    form: document.querySelector('#task-form'),
+    taskList:  document.querySelector('.collection'),
+    clearBtn: document.querySelector('.clear-tasks'),
+    filter: document.querySelector('#filter'),
+    taskInput: document.querySelector('#task'),
+    closeIcon: '<i class="fa fa-remove"></i>',
 }
 
-function getLiElement() {
-    const liElement = document.createElement('li');
-    liElement.className = 'collection-item';
-    liElement.appendChild(document.createTextNode(taskInput.value));
-    return liElement;
+//Task List UI Selectors
+const selectors = {
+    closeItem: '.delete-item secondary-content',
 }
 
-function getLinkElement() {
-    const link = document.createElement('a');
-    link.className = closeItem; 
-    link.innerHTML = closeIcon;
-    return link;
-}
+//Functions to be used in the task list UI
+const taskFunctions = {
+    getLiElement: () => {
+        const liElement = document.createElement('li');
+        liElement.className = 'collection-item';
+        liElement.appendChild(document.createTextNode(elements.taskInput.value));
+        return liElement;
+    },
+    getLinkElement: () => {
+        const link = document.createElement('a');
+        link.className = selectors.closeItem; 
+        link.innerHTML = elements.closeIcon;
+        return link;
+    },
+    clearInput: () => {
+        return elements.taskInput.value = '';
+    },
+    addTask: (e) => {
+        if(elements.taskInput.value === '') {
+            alert('Add a Task!');
+        }
+        //Append the link to li
+        taskFunctions.getLiElement().appendChild(taskFunctions.getLinkElement());
 
-function clearInput() {
-    return taskInput.value = '';
-}
+        //Append li to ul
+        elements.taskList.appendChild(taskFunctions.getLiElement());
 
-function addTask(e) {
-    if(taskInput.value === '') {
-        alert('Add a Task!');
+        taskFunctions.clearInput();
+        e.preventDefault();
     }
-    //Append the link to li
-    getLiElement().appendChild(getLinkElement());
-
-    //Append li to ul
-    taskList.appendChild(getLiElement());
-
-    clearInput();
-    e.preventDefault();
 }
 
-loadEventListeners();
+const loadEventListeners = {
+    onSubmit: () => {
+        return elements.form.addEventListener('submit', taskFunctions.addTask);
+    }
+}
+
+loadEventListeners.onSubmit();
