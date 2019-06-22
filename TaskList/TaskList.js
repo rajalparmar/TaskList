@@ -127,8 +127,14 @@ const loadEventListeners = {
     }
 }
 
-loadEventListeners.onAddTaskClick();
-loadEventListeners.onCancelClick();
-loadEventListeners.onClearButtonCLick();
-loadEventListeners.onFilterTasks();
-loadEventListeners.onPageLoad();
+const initEventListeners = () => {
+    loadEventListeners.onAddTaskClick();
+    loadEventListeners.onCancelClick();
+    loadEventListeners.onClearButtonCLick();
+    loadEventListeners.onFilterTasks();
+    loadEventListeners.onPageLoad();
+}
+initEventListeners();
+
+
+
