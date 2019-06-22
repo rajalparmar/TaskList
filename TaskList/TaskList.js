@@ -23,10 +23,8 @@ const taskFunctions = {
         if(elements.taskInput.value === '') {
             alert('Add a Task!');
         }
-
-        const listItem = helperFunctions.getListItem();
-        //Append listItem to ul
-        elements.taskList.appendChild(listItem);
+        helperFunctions.addLiToUl();
+        taskFunctions.storeTaskInLocalStorage(elements.taskInput.value);
         taskFunctions.clearInput();
         e.preventDefault();
     },
@@ -34,6 +32,7 @@ const taskFunctions = {
         if (e.target.parentElement.classList.contains('delete-item')) {
             if(confirm('Are you sure you want to delete this item?')) {
                 e.target.parentElement.parentElement.remove();
+                taskFunctions.removeTaskFromLocalStorage(e.target.parentElement.parentElement);
             }
         }
     },
@@ -41,6 +40,7 @@ const taskFunctions = {
         while(elements.taskList.firstChild) {
             elements.taskList.removeChild(elements.taskList.firstChild);
         }
+        localStorage.clear();
     },
     filterTasks: (e) => {
         const userInput = e.target.value.toLowerCase();
@@ -54,17 +54,46 @@ const taskFunctions = {
                 task.style.display = 'none';
             }
         });
+    },
+    storeTaskInLocalStorage: (task) => {
+        let tasks = taskFunctions.tasksInLocalStorage();
+        tasks.push(task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    },
+    getTasksFromLocalStorage: () => {
+        let tasks = taskFunctions.tasksInLocalStorage();
+        tasks.forEach((task) => {
+            helperFunctions.addLiToUl(task);
+        });
+    },
+    removeTaskFromLocalStorage: (taskItem) => {
+        let tasks = taskFunctions.tasksInLocalStorage();
+        tasks.forEach((task, index) => {
+            if(taskItem.textContent === task) {
+                tasks.splice(index, 1);
+            }
+        });
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    },
+    tasksInLocalStorage: () => {
+        let tasks;
+        if(localStorage.getItem('tasks') === null) {
+            tasks = [];
+        } else {
+            tasks = JSON.parse(localStorage.getItem('tasks'));
+        }
+        return tasks;
     }
 }
 const helperFunctions = {
     addClassName: (element, elementClassName) => {
         return element.className = elementClassName;
     },
-    getListItem: () => {
+    getListItem: (task) => {
         //create li element 
         const li = document.createElement('li');
         li.className = 'collection-item';
-        li.appendChild(document.createTextNode(elements.taskInput.value));
+        li.appendChild(document.createTextNode((task) ? task : elements.taskInput.value));
         //create link element
         const link = document.createElement('a');
         link.className = selectors.closeItem;
@@ -72,6 +101,11 @@ const helperFunctions = {
         //append link to li
         li.appendChild(link);
         return li;
+    },
+    addLiToUl: (task) => {
+        const listItem = helperFunctions.getListItem(task);
+        //Append listItem to ul
+        elements.taskList.appendChild(listItem);
     },
 }
 
@@ -87,6 +121,9 @@ const loadEventListeners = {
     },
     onFilterTasks: () => {
         return elements.filter.addEventListener('keyup', taskFunctions.filterTasks)
+    },
+    onPageLoad: () => {
+        return document.addEventListener('DOMContentLoaded', taskFunctions.getTasksFromLocalStorage);
     }
 }
 
@@ -94,3 +131,4 @@ loadEventListeners.onAddTaskClick();
 loadEventListeners.onCancelClick();
 loadEventListeners.onClearButtonCLick();
 loadEventListeners.onFilterTasks();
+loadEventListeners.onPageLoad();
